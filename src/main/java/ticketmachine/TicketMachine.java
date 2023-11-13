@@ -57,12 +57,19 @@ public class TicketMachine {
 	}
 
 	/**
+	 * sets a new value to the balance
+	 * @param balance
+	 */
+	private void setBalance(int balance) { this.balance = balance; }
+
+	/**
 	 * Receive an amount of money in cents from a customer.
 	 *
 	 * @param amount the amount inserted, in cents (positive)
 	 * @throws IllegalArgumentException if amount is not positive
 	 */
 	public void insertMoney(int amount) {
+		if(amount < 0) throw new IllegalArgumentException("Inserted value must be positive");
 		balance = balance + amount;
 	}
 
@@ -72,8 +79,13 @@ public class TicketMachine {
 	 * @return the balance
 	 */
 	public int refund() {
-		System.out.println("Je vous rends : " + balance + " centimes");
-		return balance;
+		int balanceBeforeRefund = this.getBalance();
+		System.out.println("Je vous rends : " + balanceBeforeRefund + " centimes");
+
+		// Reset balance
+		this.setBalance(0);
+
+		return balanceBeforeRefund;
 	}
 
 	/**
@@ -82,13 +94,33 @@ public class TicketMachine {
 	 * @return vrai si le ticket a été imprimé, faux sinon
 	 */
 	public boolean printTicket() {
-		// Simulate the printing of a ticket.
-		System.out.println("##################");
-		System.out.println("# The BlueJ Line");
-		System.out.println("# Ticket");
-		System.out.println("# " + price + " cents.");
-		System.out.println("##################");
-		System.out.println();
-		return true;
+		boolean ticketImpression = checkBalanceForTicketImpression();
+		if(ticketImpression)
+		{
+			// Simulate the printing of a ticket.
+			System.out.println("##################");
+			System.out.println("# The BlueJ Line");
+			System.out.println("# Ticket");
+			System.out.println("# " + price + " cents.");
+			System.out.println("##################");
+			System.out.println();
+			decrementBalance();
+			incrementTotal();
+		}
+		return ticketImpression;
+
+	}
+
+	private void incrementTotal() {
+		this.total += this.price;
+	}
+
+	private void decrementBalance() {
+		this.setBalance(this.getBalance() - this.getPrice());
+	}
+
+	private boolean checkBalanceForTicketImpression()
+	{
+		return this.balance >= this.price;
 	}
 }
